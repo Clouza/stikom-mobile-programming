@@ -4,16 +4,24 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,9 +30,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     GridView gridViewData;
     ImageButton buttonAdd;
+    ArrayList<Mahasiswa> data_mhs = new ArrayList<Mahasiswa>();
+    Mahasiswa tempData;
+    private final int REQUEST_PERMISSION_READIMAGE = 1001;
+    DatabaseHelper databaseHelper = new DatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +59,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ManageDataActivity.class);
+                intent.putExtra("Mode", "Insert");
                 startActivity(intent);
             }
         });
+
+        if (databaseHelper.getCountData() > 0) {
+            data_mhs = databaseHelper.transferToArrayList(getApplicationContext());
+            if (data_mhs.size() > 0) {
+                setAdapterGrid();
+            }
+        }
     }
 
     void showPermissionAgain(String title, String message, String kindPermission, int requestCode) {
@@ -97,5 +119,48 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Akses Image Tidak Disetujui", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    class myListAdapter extends ArrayAdapter<Mahasiswa> {
+        public myListAdapter() {
+            super(MainActivity.this, R.layout.data_item, data_mhs);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getLayoutInflater().inflate(R.layout.data_item, parent, false);
+            }
+            Mahasiswa myMhs = data_mhs.get(position);
+            ImageView imv = (ImageView) convertView.findViewById(R.id.imageViewFotoGrid);
+            TextView tvNim = (TextView) convertView.findViewById(R.id.textViewNimGrid);
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 10;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(myMhs.getPath(), options);
+            imv.setImageBitmap(bitmap);
+            tvNim.setText(myMhs.getNim());
+
+            return convertView;
+//            return super.getView(position, convertView, parent);
+        }
+    }
+
+    private void setAdapterGrid() {
+        gridViewData.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                tempData = data_mhs.get(position);
+                Intent intent = new Intent(MainActivity.this, ManageDataActivity.class);
+                intent.putExtra("data", tempData);
+                intent.putExtra("Mode", "updatedelete");
+                startActivity(intent);
+            }
+        });
+
+        ArrayAdapter<Mahasiswa> adapter = new myListAdapter();
+        gridViewData.setAdapter(adapter);
     }
 }
