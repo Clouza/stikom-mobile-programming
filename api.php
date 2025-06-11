@@ -14,8 +14,8 @@ if (isset($apicall)) {
             require_once "insertData.php";
             break;
 
-        case "uploadData":
-            require_once "uploadData.php";
+        case "updateData":
+            require_once "updateData.php";
             break;
 
         case "deleteData":
