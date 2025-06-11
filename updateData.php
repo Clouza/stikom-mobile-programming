@@ -2,10 +2,10 @@
 
 $params = [
     "IDMhs",
-    "Nama",
-    "Umur",
-    "MyFoto1",
-    "MyFoto2",
+    "nama",
+    "umur",
+    "foto1",
+    "foto2",
 ];
 
 if (isTheseParameterAvailable($params)) {

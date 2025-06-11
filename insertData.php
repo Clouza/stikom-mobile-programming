@@ -2,10 +2,10 @@
 
 $params = [
     "IDMhs",
-    "Nama",
-    "Umur",
-    "MyFoto1",
-    "MyFoto2",
+    "nama",
+    "umur",
+    "foto1",
+    "foto2",
 ];
 
 if (isTheseParameterAvailable($params)) {
@@ -17,13 +17,13 @@ if (isTheseParameterAvailable($params)) {
 
     try {
         $stmt = $conn->prepare("INSERT INTO mahasiswa VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssis", $id, $nama, $umur, $foto2);
+        $stmt->bind_param("ssis", $id, $nama, $umur, $foto1);
 
         if ($stmt->execute()) {
             $response["error"] = false;
             $response["message"] = "Insert Success";
         } else {
-            $response["error"] = false;
+            $response["error"] = true;
             $response["message"] = "Insert Failed";
         }
     } catch (\Exception $exception) {

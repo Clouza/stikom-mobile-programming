@@ -4,7 +4,6 @@ require_once "koneksi.php";
 
 $apicall = $_GET["apicall"];
 $response = [];
-
 if (isset($apicall)) {
     switch ($apicall) {
         case "loadData":
